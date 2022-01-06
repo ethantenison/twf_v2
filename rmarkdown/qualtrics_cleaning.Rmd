@@ -1,0 +1,71 @@
+---
+title: "qualtrics_cleaning"
+author: "Ethan Tenison"
+date: "`r format(Sys.Date(), '%B %d, %Y') `"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+# Qualtrics data cleaning 
+
+```{r libraries}
+
+library(tidyverse)
+library(qualtRics)
+library(conflicted)
+library(janitor)
+library(ggmap)
+
+conflict_prefer("filter", "dplyr")
+
+```
+
+### Data pull 
+
+```{r pull}
+
+# Connecting to the Qualtrics API
+qualtrics_api_credentials(
+api_key = Sys.getenv("qualtrics_key"), 
+base_url = "ca1.qualtrics.com", 
+)
+
+#Pulling list of surveys
+surveys <- all_surveys() 
+#Finding the row index for organization and student surveys
+survey_number <- which(surveys$name=="PT 2050 ENGOs in Texas - Final", arr.ind=TRUE)
+#Fetching the Survey Contents 
+df_raw <- fetch_survey(surveyID = surveys$id[survey_number], force_request = TRUE)
+
+```
+
+### Trimming data 
+
+```{r trimming}
+
+
+df <- df_raw |> 
+  clean_names() |> 
+  filter(finished != FALSE) |> #close to 100 didn't finish 
+  select(-c(start_date:user_language))
+
+```
+
+
+### Map Sneak Peak
+
+```{r simple_map}
+
+
+map <- df |>
+  filter(q7_21 == "Yes",!is.na(q7_18)) |>
+  select(q1_2, q7_15, q7_16, q7_18) |> 
+  mutate_geocode(q7_18q)
+
+```
+
+
