@@ -31,7 +31,7 @@ conflict_prefer("filter", "dplyr")
 # Connecting to the Qualtrics API
 qualtrics_api_credentials(
 api_key = Sys.getenv("qualtrics_key"), 
-base_url = "ca1.qualtrics.com", 
+base_url = "ca1.qualtrics.com"
 )
 
 #Pulling list of surveys
@@ -51,20 +51,45 @@ df_raw <- fetch_survey(surveyID = surveys$id[survey_number], force_request = TRU
 df <- df_raw |> 
   clean_names() |> 
   filter(finished != FALSE) |> #close to 100 didn't finish 
-  select(-c(start_date:user_language))
+  select(-c(start_date:user_language)) |> 
+  filter(q1_2 != "lll")
 
 ```
 
 
 ### Map Sneak Peak
 
-```{r simple_map}
+```{r simple_map, echo=FALSE}
 
 
 map <- df |>
   filter(q7_21 == "Yes",!is.na(q7_18)) |>
   select(q1_2, q7_15, q7_16, q7_18) |> 
-  mutate_geocode(q7_18q)
+  mutate(lon = NA, 
+         lat = NA,
+         q7_18 = case_when( #fixing addresses 
+           q7_18 == "3710 Cedar St., Suite #230, Austin, Texas, 78705" ~
+             "3710 Cedar St, Austin, TX 78705",
+           q7_18 == "2186 Jackson Keller Road #533, San Antonio Tx 78213" ~
+             "2186 Jackson Keller Road, San Antonio, TX 78213",
+           q7_18 == "PO Box 140650" ~
+             "PO Box 140650, Dallas, TX 75214",
+           q7_18 == "2921 East 17th Street, Building D, Ste #1, Austin Texas 78702" ~
+             "2921 East 17th Street, Austin, TX 78702",
+           q7_18 == "801 S Fillmore St. #700  Amarillo/Texas/79101" ~
+             "801 S Fillmore, Amarillo, TX 79101",
+           q7_18 == "P.O. Box 685261" ~
+             "Po Box 685261, Austin, TX 78768",
+           TRUE ~ q7_18
+         ))
+
+
+geocodes <- geocode(as.character(map$q7_18))
+map[,5:6] <- geocodes
+
+nas <- map |> 
+  filter(is.na(lon))
+  
 
 ```
 
