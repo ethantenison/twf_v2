@@ -57,14 +57,13 @@ df <- df_raw |>
 ```
 
 
-### Map Sneak Peak
+### Geomapping
 
 ```{r simple_map, echo=FALSE}
 
 
-map <- df |>
+df2 <- df |>
   filter(q7_21 == "Yes",!is.na(q7_18)) |>
-  select(q1_2, q7_15, q7_16, q7_18) |> 
   mutate(lon = NA, 
          lat = NA,
          q7_18 = case_when( #fixing addresses 
@@ -83,14 +82,43 @@ map <- df |>
            TRUE ~ q7_18
          ))
 
-
-geocodes <- geocode(as.character(map$q7_18))
-map[,5:6] <- geocodes
-
-nas <- map |> 
-  filter(is.na(lon))
-  
+geocodes <- geocode(as.character(df2$q7_18))
+df2[,204:205] <- geocodes
 
 ```
 
+
+```{r leaflet}
+library(leaflet)
+
+m <- leaflet(df2) |> 
+  addTiles() |> 
+  addMarkers(lng = df2$lon, lat = df2$lat)
+m
+
+```
+
+
+# Data minus network 
+
+```{r data_nonetwork}
+
+df3 <- df2 |> 
+  select(-c(starts_with("q3"),#removing network questions
+            -c(starts_with("q6")),
+            -c(q1_3:q1_6, q8_5))) |>  #mostly blank data 
+  mutate(q2_3_4 = replace_na(q2_3_4,""),#collapsing the secondary obj
+         q2_3_5 = replace_na(q2_3_5,""),
+         q2_3_6 = replace_na(q2_3_6,""),
+         q2_3_7 = replace_na(q2_3_7,""),
+         q2_3_8 = replace_na(q2_3_8,""),
+         q2_3 = paste0(q2_3_4,",", q2_3_5,
+                       ",", q2_3_6,",", q2_3_7,",", q2_3_8),
+         q2_3 = gsub("^,+|,+$", "",q2_3 ),
+         q2_3 = gsub(",,", ", ",q2_3 ),
+         q2_3 = gsub(",", ", ",q2_3 ))
+
+
+
+```
 
