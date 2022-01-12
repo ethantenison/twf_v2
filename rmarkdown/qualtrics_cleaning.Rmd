@@ -103,22 +103,45 @@ m
 
 ```{r data_nonetwork}
 
-df3 <- df2 |> 
-  select(-c(starts_with("q3"),#removing network questions
-            -c(starts_with("q6")),
-            -c(q1_3:q1_6, q8_5))) |>  #mostly blank data 
-  mutate(q2_3_4 = replace_na(q2_3_4,""),#collapsing the secondary obj
-         q2_3_5 = replace_na(q2_3_5,""),
-         q2_3_6 = replace_na(q2_3_6,""),
-         q2_3_7 = replace_na(q2_3_7,""),
-         q2_3_8 = replace_na(q2_3_8,""),
-         q2_3 = paste0(q2_3_4,",", q2_3_5,
-                       ",", q2_3_6,",", q2_3_7,",", q2_3_8),
-         q2_3 = gsub("^,+|,+$", "",q2_3 ),
-         q2_3 = gsub(",,", ", ",q2_3 ),
-         q2_3 = gsub(",", ", ",q2_3 ))
 
-
+df3 <- df2 |>
+  #Removing network questions
+  select(-c(starts_with("q3"))) |>
+  select(-c(starts_with("q6"))) |>
+  #mostly blank data
+  select(-c(q1_3:q1_6, q8_5)) |>
+  mutate(
+    #collapsing the secondary obj
+    across(q2_3_4:q2_3_8, ~ replace_na(., "")),
+    q2_3 = paste0(q2_3_4, ",", q2_3_5,
+                  ",", q2_3_6, ",", q2_3_7, ",", q2_3_8),
+    q2_3 = gsub("^,+|,+$", "", q2_3),
+    q2_3 = gsub(",,", ", ", q2_3),
+    q2_3 = gsub(",", ", ", q2_3)
+  ) |>
+  #removing ind secondary columns
+  select(-c(q2_3_4:q2_3_8)) |>
+  #Collapsing types of work columns
+  mutate(
+    across(q2_5_10:q2_5_11_text, ~ replace_na(., "")),
+    q2_5 = paste0(
+      q2_5_10,",",q2_5_5,",",q2_5_4,",", q2_5_6,",",q2_5_9,",",q2_5_1,",",
+      q2_5_2,",",q2_5_7,",",q2_5_8,",",q2_5_12,",",q2_5_3,",",q2_5_11,",",
+      q2_5_11_text,","
+    ),
+    q2_5 = gsub("^,+|,+$", "", q2_5),
+    q2_5 = gsub(",+", ", ", q2_5)) |> 
+  select(-c(q2_5_10:q2_5_11_text)) |> 
+  #Collapsing extreme weather 
+  mutate(
+    across(q4_2_1:q4_2_7_text, ~ replace_na(., "")),
+    q4_2 = paste0(
+      q4_2_1,",",q4_2_2,",",q4_2_5,",",q4_2_3,",",q4_2_4,",",q4_2_6,",",
+      q4_2_7,",",q4_2_7_text
+    ),
+    q4_2 = gsub("^,+|,+$", "", q4_2),
+    q4_2 = gsub(",+", ", ", q4_2)) |> 
+  select(-c(q4_2_1:q4_2_7_text))
 
 ```
 
