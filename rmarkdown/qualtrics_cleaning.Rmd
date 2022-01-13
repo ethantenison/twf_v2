@@ -50,8 +50,9 @@ df_raw <- fetch_survey(surveyID = surveys$id[survey_number], force_request = TRU
 
 df <- df_raw |> 
   clean_names() |> 
-  filter(finished != FALSE) |> #close to 100 didn't finish 
-  select(-c(start_date:user_language)) |> 
+  #close to 100 didn't finish 
+  filter(finished != FALSE) |> 
+  select(-c(start_date:user_language)) |>
   filter(q1_2 != "lll")
 
 ```
@@ -66,7 +67,8 @@ df2 <- df |>
   filter(q7_21 == "Yes",!is.na(q7_18)) |>
   mutate(lon = NA, 
          lat = NA,
-         q7_18 = case_when( #fixing addresses 
+         # Many address were not written using the right syntax 
+         q7_18 = case_when( 
            q7_18 == "3710 Cedar St., Suite #230, Austin, Texas, 78705" ~
              "3710 Cedar St, Austin, TX 78705",
            q7_18 == "2186 Jackson Keller Road #533, San Antonio Tx 78213" ~
@@ -82,6 +84,7 @@ df2 <- df |>
            TRUE ~ q7_18
          ))
 
+#Geomapping 
 geocodes <- geocode(as.character(df2$q7_18))
 df2[,204:205] <- geocodes
 
@@ -97,7 +100,6 @@ m <- leaflet(df2) |>
 m
 
 ```
-
 
 # Data minus network 
 
@@ -141,7 +143,35 @@ df3 <- df2 |>
     ),
     q4_2 = gsub("^,+|,+$", "", q4_2),
     q4_2 = gsub(",+", ", ", q4_2)) |> 
-  select(-c(q4_2_1:q4_2_7_text))
+  select(-c(q4_2_1:q4_2_7_text)) |> 
+  #collapsing results of extreme weather q4_5
+  mutate(
+    across(q4_5_1:q4_5_10, ~ replace_na(., "")),
+    q4_5 = paste0(
+      q4_5_1,",",q4_5_2,",",q4_5_5,",",q4_5_3,",",q4_5_4,",",q4_5_6,",",
+      q4_5_7,",",q4_5_8,",", q4_5_9,",", q4_5_10,","
+    ),
+    q4_5 = gsub("^,+|,+$", "", q4_5),
+    q4_5 = gsub(",+", ", ", q4_5)) |> 
+  select(-c(q4_5_1:q4_5_10)) |> 
+#collapsing results of direct assistance q4_6
+  mutate(
+    across(q4_6_1:q4_6_4, ~ replace_na(., "")),
+    q4_6 = paste0(
+      q4_6_1,",",q4_6_2,",",q4_6_3,",",q4_6_4
+    ),
+    q4_6 = gsub("^,+|,+$", "", q4_6),
+    q4_6 = gsub(",+", ", ", q4_6)) |> 
+  select(-c(q4_6_1:q4_6_4)) |> 
+  #collapsing results of covid impact q4_6
+  mutate(
+    across(q4_6_1:q4_6_4, ~ replace_na(., "")),
+    q4_6 = paste0(
+      q4_6_1,",",q4_6_2,",",q4_6_3,",",q4_6_4
+    ),
+    q4_6 = gsub("^,+|,+$", "", q4_6),
+    q4_6 = gsub(",+", ", ", q4_6)) |> 
+  select(-c(q4_6_1:q4_6_4))
 
 ```
 
