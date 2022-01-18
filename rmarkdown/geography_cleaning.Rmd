@@ -1,0 +1,93 @@
+---
+title: "geographies"
+author: "Ethan Tenison"
+date: "1/18/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+
+# Creating a dataset of geographies 
+
+```{r cars}
+library(readxl)
+library(sf)
+library(janitor)
+library(tidyverse)
+library(rmapshaper)
+```
+
+# GCDs
+
+Crazy oblong boundaries 
+
+```{r gcds, echo=FALSE}
+gcd <-
+  st_read("data/external/GCD_Shapefiles/TWDB_GCD_NOV2019.shp") |> 
+  clean_names() |>
+  st_transform("+proj=longlat +ellps=WGS84 +datum=WGS84") |> 
+  ms_simplify(keep = 0.2,keep_shapes = TRUE)
+
+plot(gcd['sqmiles'])
+```
+
+# Major Aquifers
+
+```{r aqui}
+
+aqu <-
+  st_read("data/external/major_aquifers/NEW_major_aquifers_dd.shp") |> 
+  clean_names() |>
+  st_transform("+proj=longlat +ellps=WGS84 +datum=WGS84") |> 
+  ms_simplify(keep = 0.2,keep_shapes = TRUE)
+
+plot(aqu['aq_name'])
+
+```
+
+# Riverbasins
+
+```{r river_basins}
+
+rb <-
+  st_read("data/external/Major_River_Basins_Shapefile/TWDB_MRBs_2014.shp") |> 
+  clean_names() |>
+  st_transform("+proj=longlat +ellps=WGS84 +datum=WGS84") |> 
+  ms_simplify(keep = 0.2,keep_shapes = TRUE)
+
+plot(rb['basin_name'])
+
+```
+
+# Major Rivers
+
+```{r rivers}
+
+riv <-
+  st_read("data/external/Major_Rivers_dd83/MajorRivers_dd83.shp") |> 
+  clean_names() |>
+  st_transform("+proj=longlat +ellps=WGS84 +datum=WGS84") |> 
+  ms_simplify(keep = 0.2,keep_shapes = TRUE)
+
+plot(riv['name'])
+
+```
+
+# Regional Water Planning Areas
+
+```{r rwpa}
+
+rwpa <-
+  st_read("data/external/RWPA_Shapefile/TWDB_RWPAs_2014.shp") |> 
+  clean_names() |>
+  st_transform("+proj=longlat +ellps=WGS84 +datum=WGS84") |> 
+  ms_simplify(keep = 0.2,keep_shapes = TRUE)
+
+plot(rwpa['reg_name'])
+
+```
+
