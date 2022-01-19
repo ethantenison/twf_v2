@@ -32,6 +32,8 @@ gcd <-
   st_transform("+proj=longlat +ellps=WGS84 +datum=WGS84") |> 
   ms_simplify(keep = 0.2,keep_shapes = TRUE)
 
+saveRDS(gcd, "data/processed/gcd.rds")
+
 plot(gcd['sqmiles'])
 ```
 
@@ -44,6 +46,8 @@ aqu <-
   clean_names() |>
   st_transform("+proj=longlat +ellps=WGS84 +datum=WGS84") |> 
   ms_simplify(keep = 0.2,keep_shapes = TRUE)
+
+saveRDS(aqu, "data/processed/aqu.rds")
 
 plot(aqu['aq_name'])
 
@@ -59,6 +63,8 @@ rb <-
   st_transform("+proj=longlat +ellps=WGS84 +datum=WGS84") |> 
   ms_simplify(keep = 0.2,keep_shapes = TRUE)
 
+saveRDS(rb, "data/processed/rb.rds")
+
 plot(rb['basin_name'])
 
 ```
@@ -73,6 +79,8 @@ riv <-
   st_transform("+proj=longlat +ellps=WGS84 +datum=WGS84") |> 
   ms_simplify(keep = 0.2,keep_shapes = TRUE)
 
+saveRDS(riv, "data/processed/riv.rds")
+
 plot(riv['name'])
 
 ```
@@ -86,6 +94,8 @@ rwpa <-
   clean_names() |>
   st_transform("+proj=longlat +ellps=WGS84 +datum=WGS84") |> 
   ms_simplify(keep = 0.2,keep_shapes = TRUE)
+
+saveRDS(rwpa, "data/processed/rwpa.rds")
 
 plot(rwpa['reg_name'])
 
