@@ -1,0 +1,40 @@
+.myClass {
+        font-size: 1.2em;
+        line-height: 50px;
+        text-align: left;
+        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+        padding: 0 15px;
+        overflow: hidden;
+        color: black;
+}
+.dropdown-header .text {
+	font-weight: bold 
+}
+.dataTables_filter {
+	display: none;
+}
+
+.column {
+  float: left;
+  width: 50%;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+h1 {
+  font-weight: bold;
+  font-size: 3em;
+}
+
+h3 {
+  font-size: 1.5em;
+}
+
+h5 {
+  font-size: 1em;
+}
